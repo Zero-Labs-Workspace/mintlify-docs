@@ -1,0 +1,128 @@
+---
+title: "In-DNA Compute"
+description: "Computation performed directly on stored DNA molecules — enabling petabyte-scale search and filtering without bulk sequencing."
+---
+
+In-DNA computing turns the archive itself into an associative memory. Computation is performed directly on stored molecules, so large collections can be searched and filtered in place before any bulk sequencing. The result is massive parallelism with very low energy cost and dramatic reductions in read volume.
+
+## Data Model
+
+The archive is written as **identifiers** — DNA molecules assembled by choosing one component from each of several layers and ligating them in order.
+
+<CardGroup cols={2}>
+  <Card title="Combinatorial address space" icon="grid">
+    The Cartesian product of layers creates an address space with a well-defined
+    rank for every identifier. Data are mapped to codewords with uniform weight.
+  </Card>
+  <Card title="Trie organization" icon="sitemap">
+    A subset of layers is reserved as a key so identifiers can be addressed
+    chemically by their components. This induces a trie over the identifier
+    space, enabling dictionary-like operations in the wet lab.
+  </Card>
+</CardGroup>
+
+## Instruction Set
+
+Two primitive operations form the core of in-DNA compute:
+
+<CardGroup cols={2}>
+  <Card title="Select" icon="filter">
+    Takes a key defined by a sequence of components across a contiguous set of
+    layers. Returns the subset of identifiers that contain that key. Implemented
+    via recursive selective PCR — after *m* steps only identifiers containing
+    the full key remain enriched.
+  </Card>
+  <Card title="Quotient" icon="compress">
+    Takes a layer index *q*. Truncates all enriched molecules at layer *q* so
+    that identifiers differing only in deeper layers collapse to the same
+    sub-identifier. Signals from many descendants in the trie are summed into
+    their common ancestor.
+  </Card>
+</CardGroup>
+
+**Select** isolates by content. **Quotient** aggregates by structure. Together they support exact match queries, approximate similarity queries, and multi-step pipelines without scanning the full archive.
+
+## Exact Search Workflow
+
+<Steps>
+  <Step title="Derive bit-position keys">
+    Obtain the codeword for the query object. With weight *w*, it defines *w*
+    distinct bit-position keys.
+  </Step>
+  <Step title="Apply select for each key">
+    Run select on each key. Merge the enriched products.
+  </Step>
+  <Step title="Apply quotient">
+    Quotient at the layer adjacent to the bit-position key. Each true occurrence
+    contributes one strong sub-identifier; non-targets contribute weak residual
+    fragments.
+  </Step>
+  <Step title="Sequence the enriched subset">
+    A short sequencing run over this enriched library calls occurrences with
+    high signal-to-noise ratio — reading orders of magnitude fewer molecules
+    than a full scan.
+  </Step>
+</Steps>
+
+## Similarity Search Workflow
+
+Real-valued embeddings are mapped to uniform-weight codewords so that similar vectors share more one-bit positions.
+
+<Steps>
+  <Step title="Encode embeddings">
+    Choose a small set of reference points in embedding space. Assign a one to
+    the *k* nearest references for each item. Two unrelated items share *w²/L*
+    bits on average; related items share significantly more.
+  </Step>
+  <Step title="Run select on query keys">
+    Apply select on the union of the query's bit-position keys.
+  </Step>
+  <Step title="Apply quotient and measure signal">
+    Signal after quotient is proportional to shared one-bit positions — directly
+    correlating with semantic similarity.
+  </Step>
+  <Step title="Sequence top candidates">
+    A small sequencing budget recovers top candidates for precise digital
+    ranking.
+  </Step>
+</Steps>
+
+## Parallelism & Complexity
+
+<Note>
+  Select and quotient run in **single-instruction, multiple-data** fashion
+  across the entire library. The number of wet-lab steps for a select equals the
+  number of layers in the key — it does **not** depend on total stored items.
+  Total reads can drop by **two to three orders of magnitude** relative to a
+  full scan, while maintaining strong signal separation between targets and
+  non-targets.
+</Note>
+
+Multiple selects can execute in parallel in separate reactions. Large keys can be split across parallel paths and recombined. With more sophisticated chemistry, selection over a multi-layer key can be compressed into a constant number of operations.
+
+## Programmability Beyond Search
+
+The same library supports additional molecular instructions:
+
+| Operation      | Mechanism                                                 | Use                        |
+| -------------- | --------------------------------------------------------- | -------------------------- |
+| AND / OR logic | Controlled hybridization of single-stranded identifiers   | Set intersection and union |
+| Counting       | Concentration-based representation                        | Majority voting            |
+| Bit rewrite    | Selective enrichment + controlled ligation or degradation | In-place update            |
+
+These micro-instructions compose into higher-level operations — filtering, set logic, and associative arithmetic — directly in the archive.
+
+## Design Parameters
+
+| Parameter                | Effect                                                                                       |
+| ------------------------ | -------------------------------------------------------------------------------------------- |
+| Codeword length _L_      | Higher _L_ improves selectivity and similarity resolution; increases identifiers to assemble |
+| Codeword weight _w_      | Lower _w_ reduces collision rate; lower quotient signal                                      |
+| Layer allocation         | Determines which attributes are searchable keys and traversal depth                          |
+| Primer & overhang design | Controls enrichment efficiency and signal-to-noise ratio                                     |
+
+## Scope and Limits
+
+In-DNA computing excels at selection, association, and reduction over very large collections with extremely low energy. It is not a replacement for floating-point numerical computation or model training.
+
+The intended pattern is **molecular filtering and recall in place**, followed by compact digital sequencing and precise ranking. This hybrid approach combines molecular-scale parallelism with digital precision — the most efficient way to work with archives at petabyte and exabyte scale.

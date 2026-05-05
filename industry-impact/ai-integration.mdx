@@ -1,0 +1,68 @@
+---
+title: "AI Integration"
+description: "DNA as a permanent embedding archive and molecular vector database — first-stage recall at molecular scale, final ranking done digitally."
+---
+
+Artificial intelligence depends on access to massive datasets and the ability to search them efficiently. Current approaches rely on large compute clusters and expensive memory systems. DNA provides an alternative storage and compute layer where embeddings and datasets can be preserved permanently and searched at molecular scale.
+
+## Embedding Archives
+
+Modern AI workflows transform data into **embeddings** — high-dimensional vectors representing semantic meaning. Millions or billions of embeddings are generated for language, images, proteins, and blockchain transactions. Storing these in DNA creates a permanent semantic index.
+
+<Steps>
+  <Step title="Map to sparse codeword">
+    Each embedding is mapped to a sparse codeword with uniform weight.
+  </Step>
+  <Step title="Encode into identifiers">
+    Codewords are encoded into DNA identifiers through combinatorial assembly.
+  </Step>
+  <Step title="Molecular vector database">
+    The archive becomes a molecular vector database — capable of similarity
+    search through biochemical operations alone.
+  </Step>
+</Steps>
+
+## In-DNA Similarity Search
+
+**Select** and **quotient** provide the primitives for approximate nearest-neighbor search:
+
+1. A query embedding is converted into a codeword
+2. Select operations enrich identifiers that overlap with its one-bit positions
+3. Quotient aggregates signals from related items
+4. Molecular signal strength correlates with similarity to the query
+5. Only a fraction of molecules need to be sequenced — reducing digital compute by orders of magnitude
+
+## Hybrid Workflows
+
+DNA search is not a replacement for GPU training or fine-grained ranking. It acts as a **first-stage filter**:
+
+<CardGroup cols={2}>
+  <Card title="Stage 1 — Molecular recall" icon="dna">
+    Biochemical select and quotient narrow the candidate pool from billions to
+    thousands. Energy and compute cost: near zero.
+  </Card>
+  <Card title="Stage 2 — Digital ranking" icon="microchip">
+    Sequence only the enriched subset. Run final ranking and inference digitally
+    on a compact candidate set.
+  </Card>
+</CardGroup>
+
+This hybrid architecture reduces compute cost and energy use while scaling to datasets that would otherwise be impractical to keep fully online.
+
+## Model Permanence
+
+AI models are increasingly valuable intellectual property — yet weights, often hundreds of gigabytes, are stored on fragile media. Encoding weights into DNA provides century-scale preservation. On-chain anchoring guarantees model versions remain auditable and verifiable across time.
+
+<Note>
+  A model trained today can be reproduced or audited decades into the future —
+  with no dependence on any specific hardware, format, or cloud provider.
+</Note>
+
+## Applications
+
+| Domain               | DNA enables                                                                                      |
+| -------------------- | ------------------------------------------------------------------------------------------------ |
+| Language models      | Store embeddings of corpora; retrieve documents by semantic similarity                           |
+| Drug discovery       | Store embeddings of chemical libraries and proteins; retrieve candidates by molecular similarity |
+| Blockchain analytics | Store embeddings of transactions or contracts; run similarity queries across historical ledgers  |
+| Multi-modal AI       | Preserve image, video, and genomic embeddings together in a unified molecular archive            |
