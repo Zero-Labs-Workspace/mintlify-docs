@@ -1,0 +1,78 @@
+---
+title: "BlackOps Messenger"
+description: "End-to-end encrypted messaging that runs inside the same session model as the rest of BlackOps OS. No provider server, no metadata routed outside the encrypted transport."
+---
+
+BlackOps Messenger is the messaging client shipped with BlackOps OS. Messages between two users are end-to-end encrypted, transported through [Route](/modules/route) like any other traffic, and bound to the session model that scopes the rest of the system. There is no provider server holding messages on your behalf, and no metadata channel separate from the message transport.
+
+This page covers how addressing and identity work, what the transport looks like, what a network observer can and cannot see, and what the messenger does not protect against.
+
+## Addressing and identity
+
+A messaging system has to solve a hard tension with the session model: identities are scoped to a session, but two people who want to keep talking across sessions need to find each other. BlackOps Messenger separates the two notions.
+
+- **Contact identity is long-lived and cryptographic.** It is a public key the two parties agree on out-of-band the first time they pair. It does not appear on the network and is not a phone number, an email, or an account at a provider.
+- **Routing identity is per-session.** When the messenger needs to deliver a message, it does so through the session's routing identity, which is unrelated to the contact identity above and rotates every session.
+
+A contact identity is something you and your peer hold privately on your respective devices. Two contact identities never appear together in any place the OS does not control.
+
+<Note>
+The exact pairing flow (QR code, short authentication string, pre-shared code) is documented in the messenger's user guide. The architectural property to remember is: the long-lived identity is a key, not an address.
+</Note>
+
+## Transport
+
+Messages do not pass through a provider server. There is no inbox sitting on infrastructure outside the OS. When two endpoints are both online, messages move directly through Route between them. When the recipient is offline, the message is held locally at the sender until delivery is possible, with a configurable retention bound.
+
+Because transport rides on Route:
+
+- The entry surface visible to an ISP looks like any other Route traffic.
+- The exit surface is whatever Route's exit topology presents.
+- DNS, NAT traversal, and connection setup all stay inside the routing layer.
+
+If Route is unhealthy, messages do not send. They do not fall back to a clear-net delivery path.
+
+## Encryption
+
+Messages are end-to-end encrypted with forward secrecy. Compromising a long-lived identity key in the future does not decrypt past traffic. Compromising a session does not decrypt traffic from prior sessions.
+
+Encryption is applied before the message reaches Route. Route encrypts again at the network layer. The decryption key for the message itself is held only by the two endpoints. It is not held by Route, by any relay involved in delivery, or by the OS infrastructure at any point in transit.
+
+## What an observer can see
+
+A network observer with visibility into either endpoint's link sees:
+
+- Activity to and from a Route exit, indistinguishable from any other Route traffic.
+- Volume and timing of bytes sent.
+
+A network observer who can correlate both endpoints sees:
+
+- That two Route-using endpoints are exchanging traffic.
+- The timing and volume of that traffic.
+
+Neither observer sees:
+
+- Message contents.
+- The contact identity of either party.
+- The conversation graph beyond the two endpoints in question.
+
+The largest leakage surface is timing correlation when both endpoints are observed. This is the global passive adversary case that Route does not assume to be absent. See [threat model](/architecture/threat-model).
+
+## What the messenger does not do
+
+- **Hide your contact identity from your peer.** Your peer knows the contact key you paired with them under. If you want to talk to the same person under multiple identities, that is a pairing-level decision, not a feature of the transport.
+- **Anonymize voluntary disclosures.** Sending your real name, phone number, or anything else identifying inside a message is data you sent. The transport does not redact it.
+- **Defeat behavior correlation.** Message timing patterns, response cadence, and online presence are observable to anyone correlating both endpoints.
+- **Recall messages after delivery.** A sent and decrypted message is on the recipient's device; the messenger cannot reach back into another device's storage.
+- **Hold messages for offline recipients on a server.** There is no server. If the recipient is not reachable within the sender-side retention bound, the message is dropped.
+
+## Continue from here
+
+<CardGroup cols={2}>
+  <Card title="BlackOps Route" icon="route" href="/modules/route">
+    The routing layer messaging traffic transits.
+  </Card>
+  <Card title="Threat model" icon="bullseye" href="/architecture/threat-model">
+    What the messenger inherits coverage against, and what it does not.
+  </Card>
+</CardGroup>

@@ -1,0 +1,77 @@
+---
+title: "Ops AI"
+description: "An agent that runs inside the session model. Inference, tool use, and any action it takes are constrained by the same privacy and execution boundaries as the rest of BlackOps OS."
+---
+
+Ops AI is the agent shipped with BlackOps OS. It can answer questions, research using the web, execute actions on behalf of the user, and operate the integrated wallet. It is not a wrapper around a cloud assistant. It runs inside the session model and is constrained by the same routing, identity, and sandboxing properties as everything else on the system.
+
+This page covers where inference happens, what the agent has access to, how actions are confirmed, and what the agent does not do.
+
+## Where inference happens
+
+{/* TODO(implementation): confirm the on-device vs hosted-via-Route choice and rewrite this section accordingly. */}
+
+Inference for Ops AI happens on the user's device. Model weights are local. Prompts and context never leave the device for the inference step itself. The hardware floor and supported model variants are documented under the system requirements.
+
+When the agent needs information that is not on the device (a search query, a price feed, a reference lookup), the request leaves through [Route](/modules/route) like any other browser request. The agent does not have a separate network path; it does not bypass the routing layer.
+
+This split is the architectural distinction worth holding onto: **inference is local; web access is routed**. The first is private because nothing is sent. The second is private because it transits Route.
+
+## What the agent has access to
+
+The agent runs inside its own [sandboxed execution environment](/architecture/secure-execution). Every capability granted to it is explicit.
+
+By default, Ops AI can:
+
+- **Read its own conversation context.** What the user has typed in the agent, plus its own prior responses, for the duration of the session.
+- **Issue web requests through Route.** For research and tool use. The exit identity is the session's exit identity; the agent does not have a separate one.
+- **Use the integrated wallet, on confirmation.** The agent can compose a transaction, but submission requires the user to confirm the signed action explicitly.
+
+Ops AI does not, by default, have:
+
+- Read access to other apps' state. The browser's history, the messenger's contents, and the wallet's full transaction log are owned by those modules.
+- Read access to the filesystem outside its own sandbox.
+- The ability to install software, change OS-level settings, or grant itself new permissions.
+
+If the user wants the agent to read content from another app, that is an explicit grant the user issues. The grant is scoped to the session and does not survive into the next session.
+
+## How actions are confirmed
+
+Reads and tool use happen without prompting. Writes that are irreversible from the user's perspective require confirmation.
+
+| Action class | Confirmation required |
+|---|---|
+| Web search, page fetch, summarization | No |
+| Wallet transaction (any signed action) | Yes, explicit confirmation per transaction |
+| Composing a message draft inside the messenger | No |
+| Sending a message inside the messenger | Yes, before send |
+| Granting Ops AI access to another app's state | Yes, per session |
+
+The confirmation step is rendered by the OS, not by the agent. This is intentional: an agent that draws its own confirmation prompts can also draw a fake one. The OS-rendered prompt is the trust anchor.
+
+## Session scope
+
+Ops AI's working memory is scoped to the session. Conversation history, intermediate state, search results, and any files it produced live in the session's working area and are wiped at session end.
+
+If the user wants to carry an artifact forward (a generated document, a transaction record), they explicitly export it before session end through the same mechanisms any other app uses.
+
+There is no "training on your data" surface here, because there is no data leaving the device for the inference step in the first place. There is also no remote feedback loop that learns from session activity.
+
+## What the agent does not do
+
+- **Send prompts to a cloud inference backend.** Inference is local.
+- **Sign transactions without confirmation.** Every signed action goes through an OS-rendered confirmation.
+- **Read another app's state without an explicit grant.** The sandbox boundary holds against the agent the same way it holds against any other app.
+- **Persist memory across sessions.** The next session starts with no agent context.
+- **Defeat behavior-level correlation.** The agent's web requests transit Route, so they inherit Route's properties: a session-bound exit identity, but no defense against an observer who correlates requests inside one session into a behavioral profile.
+
+## Continue from here
+
+<CardGroup cols={2}>
+  <Card title="Sandboxed execution" icon="cube" href="/architecture/secure-execution">
+    The execution boundary the agent runs inside, and its access controls.
+  </Card>
+  <Card title="BlackOps Route" icon="route" href="/modules/route">
+    The routing path the agent uses for any web request or external lookup.
+  </Card>
+</CardGroup>

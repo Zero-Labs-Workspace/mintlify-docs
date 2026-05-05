@@ -1,0 +1,71 @@
+---
+title: "Sandboxed execution"
+description: "How BlackOps OS confines applications to their own execution context, what crosses the sandbox boundary explicitly, and what does not cross it at all."
+---
+
+Every application on BlackOps OS runs inside a sandbox. The sandbox is not a setting an app opts into; it is the execution environment the OS provides. An app that does not understand sandboxing still runs inside one because there is no execution surface outside the sandbox to run on.
+
+This page covers what a sandbox confines, how apps that need to communicate do so, what persists across sessions, and what the sandbox does not defend against.
+
+## What the sandbox confines
+
+For each application, the sandbox provides:
+
+- **A private filesystem root.** The app sees its own root, not the system's. Other apps' files are not present anywhere on the visible filesystem.
+- **A separate process namespace.** The app cannot enumerate or signal processes belonging to other apps.
+- **A mediated network stack.** Outbound network reaches Route; there is no path to the underlying physical interface.
+- **Restricted system calls.** The set of permissible system calls is reduced to those the app needs to function. Calls outside the set fail.
+- **Per-app keys.** Cryptographic material the app holds is derived from a session-scoped per-app key, not from a system-wide secret.
+
+There is no shared writable directory between apps. There is no shared registry, no system-wide preferences area, no cross-app cache, and no analytics broadcast surface that one app can write to and another can read from.
+
+## How apps communicate when they need to
+
+Sandboxes are the default; communication between apps is the exception. When two apps need to exchange data, they do it through an explicit channel.
+
+- **OS-mediated IPC.** The OS exposes a typed, per-call channel between specific apps. The channel is authenticated to the calling app and scoped to a single message or stream. Each call is recorded.
+- **User-driven hand-off.** The user explicitly hands an artifact from one app to another (file picker, share sheet, paste). The hand-off is initiated by the user, mediated by the OS, and the receiving app sees only what was selected.
+- **Per-session capability grants.** An app can be granted read or read-write access to another app's data for the lifetime of the session. The grant is initiated by the user, recorded by the OS, and revoked at session end.
+
+Apps do not communicate by writing to a shared location, by setting environment variables in a shared shell, or by using a system-wide message bus. There is no system-wide message bus.
+
+## Per-app storage and durability
+
+Each app has a storage root for the duration of the session. Within that root, the app can persist whatever it wants. Across sessions:
+
+- By default, nothing in the storage root survives session end.
+- An app can mark specific subtrees as durable. Durable subtrees survive session end and are restored on the next session's bringup. The app sees the same path; the OS handles re-mounting.
+- The user can audit which subtrees are durable for which apps.
+
+Durability is per-subtree, not per-app. An app cannot mark its entire root as durable by default; the OS does not allow the equivalent of "remember everything".
+
+## Network access
+
+Apps reach the network only through Route. The sandbox does not present an alternate interface, does not expose raw socket access, and does not allow direct DNS resolution that bypasses the routing layer. See [BlackOps Route](/modules/route) for the network-side details.
+
+The sandbox itself does not add anything new to the network surface. It enforces that the only path out is the one Route mediates.
+
+## What crosses the boundary by design
+
+The sandbox is not airtight against the OS. Some things must cross.
+
+- **The OS reads from the sandbox** to render the app's UI, to pass through user input, and to mediate IPC. This is the trust assumption the model makes: the OS is in the trusted compute base; the apps are not.
+- **The user can hand artifacts in or out.** A file the user selects in app A and gives to app B crosses the boundary by user action.
+- **The boundary is one-way for OS-internal uses.** The OS reads from the sandbox to do its job; the sandbox does not read the OS.
+
+## What the sandbox does not defend against
+
+- **The OS itself.** The OS sees inside every sandbox; that is how mediation works. The trust assumption is that the OS is not adversarial.
+- **Side channels.** Timing, cache state, power use, and other physical-layer side channels can leak information across sandbox boundaries. The OS reduces the worst cases (no shared CPU pinning, scheduler hardening), but a determined adversary with code execution in another sandbox is still a real threat model.
+- **An app that calls Route to exfiltrate.** A sandboxed app with network access can send anything it wants through Route. The sandbox does not classify content; it bounds what the app can see and reach. If an app is malicious and the user has paired it with sensitive data, the sandbox limits but does not eliminate the risk.
+
+## Continue from here
+
+<CardGroup cols={2}>
+  <Card title="Session model" icon="arrows-rotate" href="/architecture/session-model">
+    The lifecycle that scopes the sandbox and its per-app storage roots.
+  </Card>
+  <Card title="Threat model" icon="bullseye" href="/architecture/threat-model">
+    Adversaries the sandbox is designed to contain, and adversaries it is not.
+  </Card>
+</CardGroup>

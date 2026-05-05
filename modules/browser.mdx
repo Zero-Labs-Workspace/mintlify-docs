@@ -1,0 +1,59 @@
+---
+title: "BlackOps Browser"
+description: "The browser shipped with BlackOps OS. Its privacy properties come from the OS layers it runs on top of, plus the browser-only surfaces it has to handle itself."
+---
+
+BlackOps Browser is the web browsing client shipped with BlackOps OS. The privacy properties most users care about (private routing, identity isolation, no cross-session correlation) are not implemented in the browser. They are inherited from [Route](/modules/route) and from [session identity isolation](/architecture/session-isolation), which apply to every process on the system. The browser's job is to not undo them, and to handle the privacy surfaces that exist only at the browser layer.
+
+This page covers what the browser inherits, what the browser is responsible for on its own, what a destination site actually sees, and what the browser does not do.
+
+## What the browser inherits from the OS
+
+These properties are not configurable inside the browser, because the browser does not own them.
+
+- **Routing.** All requests, WebSocket connections, WebRTC media, prefetches, and DNS lookups transit Route. The browser has no separate network path and no fallback.
+- **Network identity.** The browser sees the same per-session exit address as every other process. Two sessions present as two unrelated clients on the network.
+- **Persistent state.** Cookies, localStorage, IndexedDB, cache, service workers, and HSTS pins are scoped to the session and wiped at session end.
+
+If you want to understand the routing or identity guarantees, those are documented at the layer that owns them. The browser is downstream.
+
+## What the browser is responsible for
+
+A correctly routed request is still attributable if the browser's own surface is unique. Route changes the IP and timing; the browser controls everything above.
+
+- **TLS handshake fingerprint.** ClientHello cipher order, extensions list, ALPN entries, and other JA3-class signals are properties of the browser, not the network. The browser ships a handshake profile consistent across users.
+- **HTTP/2 and HTTP/3 frames.** SETTINGS values, header order, and priority frames vary across engines and are usable as a fingerprint. The browser normalizes these.
+- **JavaScript surface.** Canvas, WebGL, AudioContext, navigator properties, font enumeration, screen metrics, timezone, and language are clamped, randomized, or returned with a stable per-session value.
+- **WebRTC.** ICE candidate gathering would reveal local interface addresses in the default configuration. The browser constrains gathering so candidates are produced only via the routing layer.
+- **Service workers.** Service worker installation is constrained so a single-session install cannot survive into another session and re-introduce state.
+
+These are the things a "privacy mode" in a conventional browser does not fully address, and they are the things the browser layer of BlackOps OS exists to handle. Route cannot fix them; they ride above Route.
+
+## What a destination site sees
+
+For a typical session against a typical site:
+
+- An exit address that is not your real address, not used by you in the prior session, and shared with other BlackOps users.
+- A handshake and HTTP profile consistent with the rest of the BlackOps Browser population.
+- An empty cookie jar and empty client storage at session start.
+- Whatever the user voluntarily provides during the session (account logins, form submissions).
+
+The site cannot distinguish a returning user from a new user across sessions on properties the browser controls. It can still distinguish users on properties the browser does not control: account credentials, voluntarily provided identifiers, and behavior over time.
+
+## What the browser does not do
+
+- **Hide who you log in as.** If you sign into an account, the destination knows that account is the active user for the remainder of the session.
+- **Hide what you read.** The destination logs whatever you visit. Route hides where you came from; it does not hide what you asked for.
+- **Defeat behavior-level identification.** Reading the same niche content across sessions, or visiting the same set of obscure sites in the same order, is a behavior signal. The browser does not see that signal and does not flatten it.
+- **Run arbitrary extensions.** Extensions are themselves a fingerprint surface and a state-leak risk. The browser does not load user-supplied extensions; the set of supported extensions is constrained.
+
+## Continue from here
+
+<CardGroup cols={2}>
+  <Card title="BlackOps Route" icon="route" href="/modules/route">
+    The routing layer the browser inherits its network-level privacy from.
+  </Card>
+  <Card title="Session identity isolation" icon="user-secret" href="/architecture/session-isolation">
+    What's scoped per session, and what can link across them.
+  </Card>
+</CardGroup>

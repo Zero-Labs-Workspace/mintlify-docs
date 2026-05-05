@@ -1,0 +1,131 @@
+---
+title: "Tokenomics"
+description: "Supply, distribution, vesting, and utility for BLOPS, the unit of account in the BlackOps OS economy."
+---
+
+<Note>
+Numbers on this page are working drafts. Once the contract is deployed and the litepaper is published, those become the source of truth.
+</Note>
+
+BLOPS is the unit of account for the BlackOps OS economy. It is used for access, governance, and value flow inside the system. The token is not a security claim on the project, not a deposit redeemable for a service, and not a privacy guarantee. It is what gives holders a defined role in the system and a defined claim on its economy.
+
+## Quick reference
+
+| Field | Value |
+|---|---|
+| Token name | BlackOps |
+| Ticker | BLOPS |
+| Total supply | 1,000,000,000 |
+| Network | TBD |
+| Contract address | TBD (until deployed) |
+| Decimals | 18 |
+| Mintable after launch | No |
+| Burn function | Yes, see fee flow below |
+
+The total supply is fixed. There is no inflation mechanism after the emissions schedule completes. Burns reduce circulating supply but do not change total supply (the contract tracks the burned balance separately).
+
+## Supply and distribution
+
+Total supply: **1,000,000,000 BLOPS**, fixed at launch.
+
+| Allocation | Share | Tokens | Purpose |
+|---|---|---|---|
+| Team and advisors | 15% | 150,000,000 | Founding team, advisors, early contributors |
+| Treasury | 20% | 200,000,000 | Operating runway, audits, infrastructure |
+| Ecosystem | 25% | 250,000,000 | Grants, integrations, exit-node operators, third-party developers |
+| Public sale | 15% | 150,000,000 | Initial public distribution |
+| Community | 10% | 100,000,000 | Airdrops, holder rewards, contribution programs |
+| Liquidity | 5% | 50,000,000 | DEX and CEX liquidity provisioning |
+| Reserve | 10% | 100,000,000 | Long-term contingency, locked beyond initial vesting horizon |
+
+Each allocation is held in an identifiable address or contract. Holdings are auditable on-chain. The address registry is published at launch.
+
+## Vesting
+
+Vesting is enforced by contracts, not written commitments. The schedules are fixed at deployment and not modifiable.
+
+| Allocation | Lock at TGE | Cliff | Linear vest | Total horizon |
+|---|---|---|---|---|
+| Team and advisors | 100% | 12 months | 36 months after cliff | 48 months |
+| Treasury | 80% | 0 | 36 months linear | 36 months |
+| Ecosystem | 90% | 6 months | 36 months after cliff | 42 months |
+| Public sale | Per tranche | Per tranche | Per tranche | Up to 18 months |
+| Community | Per program | Per program | Per program | Up to 24 months |
+| Liquidity | 0 | 0 | 0 | Available at TGE |
+| Reserve | 100% | 36 months | None (governance-released) | Indefinite |
+
+TGE = token generation event (initial mint and contract deployment).
+
+### Circulating supply over time
+
+Maximum circulating supply at each milestone, in millions of BLOPS:
+
+| Month | Circulating | Locked |
+|---|---|---|
+| 0 (TGE) | ~110 | ~890 |
+| 6 | ~180 | ~820 |
+| 12 | ~260 | ~740 |
+| 24 | ~480 | ~520 |
+| 36 | ~750 | ~250 |
+| 48 | ~900 | ~100 |
+| 60+ | ~1,000 | 0 (excluding burned balances) |
+
+These are ceilings computed from the vesting schedule. Actual circulating supply is typically lower (community programs running below cap, ecosystem grants vesting at varying rates, treasury draws below schedule maximum). It cannot be higher.
+
+## Utility
+
+### Access tiers
+
+Holding a defined amount of BLOPS unlocks tiers of access to BlackOps OS features and infrastructure.
+
+| Tier | Hold amount | What it grants |
+|---|---|---|
+| Standard | 0 | Access to the public release. |
+| Holder | 1,000 BLOPS | Beta features, priority access during capacity-constrained windows. |
+| Operator | 50,000 BLOPS | Eligibility to run an exit node and earn from the operator allocation. |
+| Validator | 250,000 BLOPS | Governance voting weight. |
+
+Tier eligibility is computed from the on-chain balance held continuously over a defined window (placeholder: 30 days). Sales reset the window.
+
+### Staking
+
+BLOPS can be staked to support specific roles in the network.
+
+- **Exit-node operator stake.** Operators commit a stake to run exit infrastructure. Stake is slashable for documented misbehavior (downtime, log retention violations).
+- **Validator stake.** Validators commit a stake to participate in governance. Stake is locked for the duration of the voting period.
+
+Staking rewards are paid from the ecosystem allocation according to the schedule documented per role.
+
+### Governance
+
+Validators vote on proposals affecting the treasury, the ecosystem program, and protocol-level economic parameters. Proposal categories:
+
+- **Treasury spend.** Allocations from the treasury to specific recipients.
+- **Ecosystem program changes.** Funding for new programs or changes to existing ones.
+- **Parameter changes.** On-chain parameters (staking rewards, slashing thresholds, fee splits).
+
+Proposals require a quorum of validator stake. Quorum and approval thresholds are placeholder until publication.
+
+The OS itself is not governed by token vote. Routing topology, cryptographic primitives, and security-relevant defaults are the project's responsibility, with public review periods for material changes. Token governance is over the economy, not the security architecture.
+
+### Fee flow
+
+Where fees exist in the system, they flow through three sinks:
+
+1. **Burn.** A portion of each fee is burned. Burned BLOPS reduces circulating supply permanently.
+2. **Operator payout.** A portion goes to the operators who provided the underlying service (e.g. exit-node operators).
+3. **Treasury.** The remainder accrues to the treasury.
+
+Placeholder split: 50% burn, 35% operator, 15% treasury. The on-chain configuration is the source of truth.
+
+## What BLOPS is not
+
+- **A security claim.** BLOPS is not a share in the project, not a debt instrument, and does not entitle holders to revenue.
+- **A deposit.** Holding BLOPS does not store value redeemable from the project. Its value is what it does in the system, not what it can be exchanged for at the project.
+- **A privacy guarantee.** Privacy is enforced by the OS architecture, not by token holdings. Holding more BLOPS does not increase the privacy properties available to a given session.
+
+## What this page does not cover
+
+- **Price prediction.** We do not publish forecasts.
+- **How to acquire BLOPS.** Acquisition channels (exchanges, OTC) change; check the project site for the current list.
+- **Tax treatment.** Consult a professional in your jurisdiction.

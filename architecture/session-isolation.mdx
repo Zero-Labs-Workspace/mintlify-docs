@@ -1,0 +1,93 @@
+---
+title: "Session identity isolation"
+description: "The full client-distinguishable surface and how each surface is scoped to a session in BlackOps OS."
+---
+
+Identity isolation in BlackOps OS means that every signal an external party could use to recognize a returning client is scoped to a single session. This page enumerates the surface explicitly.
+
+The reason for the enumeration is that "incognito mode" is not the same thing. A typical browser private mode resets cookies and storage and stops there. The OS underneath continues exposing a consistent MAC address, a stable hostname, an NTP offset history, a DNS resolver, a TLS clock skew, and dozens of other signals an observer can use as a long-lived identifier without the browser's involvement. Real isolation has to address all of them.
+
+## The surface, by layer
+
+### Hardware-derived identifiers
+
+| Surface | Per-session behavior |
+|---|---|
+| MAC address (Wi-Fi, Ethernet, Bluetooth) | Randomized per session. Not derived from the device's burned-in address. |
+| Bluetooth controller identifier | Randomized per session. |
+| Device serial, model identifier | Not exposed to userspace where the OS surface allows that choice. |
+
+### Kernel and OS-image identifiers
+
+| Surface | Per-session behavior |
+|---|---|
+| Hostname | Generic per session, not derived from the device. |
+| Machine ID (`/etc/machine-id` and equivalents) | Session-scoped; rotated at session start. |
+| Boot ID | Effectively rotated; not durable across the session boundary. |
+| Time-since-boot, idle time | Reset semantics at session start; not usable as a long-running clock. |
+| TLS clock skew | Time source mediated by the routing layer; system time exposed to userspace is not the host's drifted clock. |
+
+### Network-layer identifiers
+
+| Surface | Per-session behavior |
+|---|---|
+| IP address (exit) | Per-session routing identity. Not derivable from the prior session. |
+| DHCP client ID, hostname option | Generic, randomized; not the device's. |
+| mDNS / Bonjour service names | Disabled or session-scoped; the device does not advertise itself with a stable name. |
+| NTP offset history | Time sync goes through the routing layer; the offset history is not a per-device fingerprint. |
+| TCP timestamp clock | Initialized per session; not a continuous-running clock across sessions. |
+
+### Userspace state
+
+| Surface | Per-session behavior |
+|---|---|
+| Cookies, localStorage, IndexedDB, cache, service workers, HSTS pins | Session-scoped storage roots. Wiped at session end. |
+| Accept-language, locale, timezone | Returned consistently within a session, varied across sessions. |
+| Font list | Clamped to a baseline list shared across users. |
+| Canvas, WebGL, AudioContext output | Clamped or returned with a stable per-session value. |
+| Screen metrics | Reported with low-entropy values shared across users. |
+| Installed-app enumeration | Not exposed; sandboxing prevents cross-app discovery. |
+
+### Application-layer signals (browser)
+
+These are not OS-level identity isolation in the strict sense. They are the browser's responsibility to clamp, but listing them here makes the boundary clear. See [BlackOps Browser](/modules/browser).
+
+| Surface | Per-session behavior |
+|---|---|
+| TLS handshake fingerprint (JA3-class) | Browser ships a profile consistent across users. |
+| HTTP/2 SETTINGS, header order, priority frames | Normalized by the browser. |
+| User-Agent, navigator properties | Set to a value consistent across the BlackOps Browser population. |
+
+## What is not isolated
+
+Voluntary disclosures and user behavior remain observable. The OS does not flatten any of the following.
+
+- **Account credentials.** Logging in links the session to that account for the duration of the session. The OS does not retroactively unlink.
+- **Content of communications.** The transport is encrypted; the content is whatever the user sent.
+- **Reading patterns.** Visiting the same niche sites in the same order across sessions is a behavior signal an external observer can use to correlate.
+- **Linguistic style.** Stylometry can identify a user across pseudonymous sessions if the writing surface is large enough.
+
+These are addressed by user practice, not by the OS.
+
+## What an observer can reconstruct
+
+Two sessions started by the same physical device, on the same network connection, by the same physical user, present as activity from two unrelated clients on every surface listed above.
+
+What an observer can still do:
+
+- Correlate sessions through voluntary disclosures (account logins, identifying form submissions).
+- Correlate sessions through user behavior (content, timing, style).
+- Correlate sessions if the observer has visibility on both the entry side and the exit side of Route, with timing analysis.
+
+These boundaries are documented in the [threat model](/architecture/threat-model).
+
+## Continue from here
+
+<CardGroup cols={2}>
+  <Card title="Session model" icon="arrows-rotate" href="/architecture/session-model">
+    The session lifecycle this isolation is bound to.
+  </Card>
+  <Card title="BlackOps Browser" icon="globe" href="/modules/browser">
+    How the browser handles application-layer fingerprinting surfaces.
+  </Card>
+</CardGroup>

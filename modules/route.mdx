@@ -1,0 +1,74 @@
+---
+title: "BlackOps Route"
+description: "The OS-level routing layer. All outbound traffic transits it; no userspace process can reach the network around it."
+---
+
+BlackOps Route is the network egress layer of BlackOps OS. Every byte leaving the device passes through it, including traffic from system processes, background daemons, and applications that have no awareness of it. It is not a daemon you start, not an interface you connect to, and not something an app needs to integrate with. It is part of the OS network stack, not something layered on top of one.
+
+This page covers what Route does, what it does not do, and how it behaves at the boundaries (session start, session end, layer failure).
+
+## Where Route sits
+
+Route lives below the userspace boundary. By the time a process holds a socket, the only path to the network is through Route. The default route, alternate physical interfaces, link-local sockets, and raw sockets either traverse Route or fail.
+
+The bypass paths Route has to close, and how:
+
+- **Interface selection.** A process cannot bind to a parallel interface to escape routing; the OS does not present one to userspace.
+- **Raw sockets.** Permission to open `SOCK_RAW` is not granted to applications, and where privileged components hold it, raw frames transit the same egress filter.
+- **DNS.** Resolution does not happen out-of-band. Resolvers are reached through Route the same as any other host.
+- **Clock and time sync.** Time sync is mediated and does not produce a clear-net query before the routing layer is up.
+
+If Route is unhealthy, traffic fails closed. There is no automatic fallback to the underlying physical interface. A process that calls `connect()` while Route is down receives `ENETUNREACH`, not a clear-net packet.
+
+## What Route does
+
+Each session brings up a routing identity that is independent from any prior session and is not derivable from the device's hardware or from prior identities. Outbound traffic is encrypted to the first hop and reaches its destination through the routing topology.
+
+What an ISP can see:
+
+- The first-hop endpoint and the timing of your traffic to it.
+- The volume of traffic, in aggregate.
+
+What a destination service can see:
+
+- The exit address, not your real address.
+- Whatever the application chose to send (request bodies, headers, identifiers tied to a logged-in account).
+
+What a passive network-wide observer can see:
+
+- The ISP-side and destination-side surfaces above. Linking the two requires correlation, which is covered in the [threat model](/architecture/threat-model).
+
+## Per-session routing identity
+
+A new session brings up a new routing identity. The identity does not roll over from the previous session, and there is no long-lived account state on the routing layer that ties two sessions together.
+
+This is the property that makes [session identity isolation](/architecture/session-isolation) work end to end. If routing reused a stable identity across sessions, the network layer would link sessions that the rest of the OS keeps separate.
+
+## What Route does not do
+
+Route is a routing layer. It is not an anonymity guarantee.
+
+- **Compromised endpoints.** If a destination service logs your traffic, Route does not change what they can log. They see a session-bound exit identity, not your real one; everything you send is what you sent.
+- **Voluntary disclosure.** Logging into an account, providing a phone number, or sending an identifying payload links the session to that information for the duration of the session.
+- **Global passive adversary.** An observer with visibility into both ends of the routing topology can correlate timing and volume. Mitigations exist; Route does not assume this adversary is absent.
+- **Application-layer fingerprints.** TLS JA3, HTTP/2 SETTINGS, font lists, canvas hashes, and similar application-level fingerprints are the application's responsibility. Route moves them; it does not change what is in them. The browser handles its own surface; see [BlackOps Browser](/modules/browser).
+
+## Operational behavior
+
+| State | What happens |
+|---|---|
+| Session start, Route healthy | Identity comes up; processes can reach the network. |
+| Session start, Route bringup failed | No process gets network reachability. The OS surfaces the failure; it does not silently fall through. |
+| Mid-session, Route degraded | Traffic queues or fails closed depending on subsystem. No clear-net fallback. |
+| Session end | Identity is rotated. No state inherited by the next session. |
+
+## Continue from here
+
+<CardGroup cols={2}>
+  <Card title="Session identity isolation" icon="user-secret" href="/architecture/session-isolation">
+    What's scoped per session, and what can link across them.
+  </Card>
+  <Card title="Threat model" icon="bullseye" href="/architecture/threat-model">
+    Adversaries Route is designed to defeat, and adversaries it is not.
+  </Card>
+</CardGroup>

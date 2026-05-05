@@ -1,133 +1,104 @@
 ---
 title: "Introduction"
-description: "Welcome to the new home for your documentation"
-icon: 'star'
+description: "An operating system that enforces network privacy, identity isolation, and execution sandboxing as properties of the system, not as apps you install."
 ---
 
-## Setting up
+## What is BlackOps OS?
 
-Get your documentation site up and running in minutes.
+BlackOps OS is an operating system where privacy is enforced below the application layer. Every process on the system routes through the privacy stack, every session wipes its own identity, and every app is sandboxed from every other. None of this is opt-in. You cannot turn it off from userspace because userspace does not have that switch.
 
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+## The Problem
 
-## Make it yours
+Every privacy tool that ships above the OS covers one surface and leaks around the others.
 
-Design a docs site that looks great and empowers your users.
+<CardGroup cols={3}>
+  <Card title="VPNs leak" icon="arrow-right-arrow-left">
+    A VPN routes only what binds to its tunnel. A misconfigured app reading from
+    the default route bypasses it silently — and the kernel has no opinion about
+    that.
+  </Card>
+  <Card title="Incognito isn't isolation" icon="eye-slash">
+    Private browsing resets cookies and storage. It does not change your MAC
+    address, hostname, NTP offset, font set, or clock skew. Fingerprinting moves
+    below the browser.
+  </Card>
+  <Card title="Encryption isn't anonymity" icon="lock-open">
+    Encrypted messengers protect message bodies. They don't hide your IP,
+    timing, contact graph, or device identifier. Anyone correlating those still
+    wins.
+  </Card>
+</CardGroup>
+
+Each tool does its own job. They cannot enforce each other — and the OS underneath is not enforcing anything at all. That is the gap BlackOps OS closes.
+
+## The Four Enforcement Properties
+
+These are not features. They are properties of the system. Every process running on BlackOps OS operates inside all four, simultaneously, with no off switch surfaced to userspace.
+
+<CardGroup cols={2}>
+  <Card title="Network egress is mediated" icon="route">
+    All outbound traffic transits the routing layer. No escape via raw sockets,
+    alternate interfaces, or the default route. If the routing layer is
+    unhealthy, traffic fails closed — never falls back to clear.
+  </Card>
+  <Card title="Identity is per-session" icon="user-secret">
+    Cookies, fingerprints, MAC, hostname, timezone, locale, and every other
+    client-distinguishable surface are scoped to the active session. Session end
+    wipes them all.
+  </Card>
+  <Card title="Execution is sandboxed" icon="cube">
+    Apps run in confined environments with explicit IPC boundaries and per-app
+    storage roots. State written by one app is not readable by another. State
+    written in one session does not carry into the next.
+  </Card>
+  <Card title="Value transfer is in-session" icon="wallet">
+    The wallet operates inside the same session lifecycle as everything else.
+    Sending or receiving does not produce identifiers that outlive the session.
+  </Card>
+</CardGroup>
+
+<Note>
+  Removing or disabling these properties is not a setting. The enforcement lives
+  in the OS itself.
+</Note>
+
+## What BlackOps OS Does Not Claim
+
+BlackOps OS is precise about its boundaries.
+
+- **It does not make compromised endpoints private.** If a service logs your traffic, the routing layer cannot control what happens at the other end.
+- **It does not defeat a global passive adversary.** The threat model is ISP, app vendor, ad network, and casual correlator — not a nation-state with full link visibility.
+- **It does not anonymize voluntary disclosures.** Logging into an account links the session to that account for its duration.
+- **It does not prevent behavioral side channels.** Reusing the same writing style or visiting the same niche sites across sessions can be correlated by an observer with no access to the OS at all.
+
+## Explore the Docs
 
 <Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+  <Card title="Architecture" icon="layer-group" href="/architecture/overview">
+    How the four enforcement layers compose — and why removing one weakens the
+    others.
   </Card>
   <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
+    title="Session model"
+    icon="arrows-rotate"
+    href="/architecture/session-model"
   >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+    What a session owns, its lifecycle states, and what survives the wipe.
   </Card>
   <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
+    title="Identity isolation"
+    icon="fingerprint"
+    href="/architecture/session-isolation"
   >
-    Auto-generate API documentation from OpenAPI specifications.
+    The full client-distinguishable surface — hardware, kernel, network, and
+    userspace — and how each is scoped.
+  </Card>
+  <Card
+    title="Sandboxed execution"
+    icon="cube"
+    href="/architecture/secure-execution"
+  >
+    How apps are confined, how they communicate when they need to, and what the
+    sandbox does not defend against.
   </Card>
 </Columns>
-
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Make your content agent ready
-
-Make your docs work for humans and AI agents alike.
-
-<Columns cols={2}>
-  <Card
-    title="Prompt component"
-    icon="robot"
-    href="/agent-ready/prompt"
-  >
-    Embed shareable AI prompts readers can copy or open in Cursor.
-  </Card>
-  <Card
-    title="Visibility"
-    icon="eye"
-    href="/agent-ready/visibility"
-  >
-    Show different content to humans and agents reading your docs.
-  </Card>
-  <Card
-    title="Contextual menu"
-    icon="bolt"
-    href="/agent-ready/contextual"
-  >
-    Give readers one-click access to Claude, ChatGPT, Cursor, and more.
-  </Card>
-  <Card
-    title="AI coding tools"
-    icon="wand-magic-sparkles"
-    href="/ai-tools/claude-code"
-  >
-    Set up Claude Code, Cursor, or Windsurf with Mintlify's skill.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>

@@ -1,0 +1,76 @@
+---
+title: "Session model"
+description: "Specification of what a session is in BlackOps OS: states, transitions, what each session owns, and what crosses session boundaries by design."
+---
+
+The session is the unit of privacy enforcement in BlackOps OS. Every property the system guarantees is bounded by it. This page is the specification.
+
+For the runtime walkthrough see [privacy enforcement](/get-started/privacy-enforcement).
+
+## What a session owns
+
+A session owns a self-contained set of state. While the session is alive, this state is the entire context in which userspace operates.
+
+- **Routing identity.** The first-hop identity Route uses for outbound traffic. Generated fresh; not derivable from prior sessions.
+- **Userspace identity surface.** Cookies, localStorage, IndexedDB, cache, accept-language, locale, timezone, and the rest of the surfaces enumerated in [identity isolation](/architecture/session-isolation).
+- **Per-app sandbox roots.** A separate filesystem root for each app, mounted from a session-scoped storage area.
+- **Working memory and ephemeral state.** In-memory secrets, tab state, agent context, in-flight messages, IPC channels.
+- **Per-session keys.** Session-scoped key material used by the routing layer and by inter-app IPC.
+
+What a session does not own: the long-lived contact identities used by [Messenger](/modules/messenger), the device's hardware, the underlying OS image, and any artifact the user has explicitly exported.
+
+## States and transitions
+
+| State | Description | Transitions to |
+|---|---|---|
+| **Idle** | No active session. The system has no userspace identity surface bound. | Bringup |
+| **Bringup** | Session is being assembled: routing identity is generated, sandbox roots are mounted, in-memory keys are derived. | Active, Failed |
+| **Active** | All four enforcement properties hold. Userspace can run. | End, Failed |
+| **End** | User-initiated teardown. Wipe is in progress. | Idle |
+| **Failed** | A required component (typically Route) failed to come up or went unhealthy beyond recovery. Userspace cannot reach the network and is being torn down. | Idle |
+
+Transitions are atomic from userspace's perspective. A process running in the Active state never observes a partial bringup or a partial wipe; it sees Active until the moment it is torn down with the rest of the session.
+
+## End-of-session wipe
+
+What is wiped, in order:
+
+1. Application processes are signalled to terminate. Apps that hold unsaved state must persist it before the wipe step or lose it.
+2. Per-app sandbox roots are unmounted.
+3. Session-scoped storage areas are zeroed and unmounted.
+4. In-memory key material (routing keys, session keys, derived per-app keys) is overwritten.
+5. The routing identity is rotated; the prior identity does not appear in the next session.
+
+After step 5, the system is back in Idle. There is no carryover state on the next bringup.
+
+## Carrying state across sessions
+
+State that needs to survive a session is the user's explicit choice. The mechanisms:
+
+- **Long-lived contact identities** (used by Messenger). These live in a key store that is not part of any session. They are not addressable by network-facing state and are not wiped at session end.
+- **User-exported artifacts.** Files, transaction records, and generated documents the user explicitly saves through the OS export mechanism.
+- **Durable per-app subtrees.** Specific subtrees an app has marked durable, after a user grant. See [sandboxed execution](/architecture/secure-execution).
+- **OS configuration.** System settings (theme, language preference) live outside the session model.
+
+Anything not in one of these categories does not survive a session. There is no quiet third path that preserves application state.
+
+## Why the session boundary is load-bearing
+
+The four enforcement properties are only meaningful relative to a session boundary.
+
+- Routing privacy without a session boundary is a stable identity rotated at clock intervals, which is correlatable on timing. The user-controlled session boundary anchors when rotation happens.
+- Identity isolation without a session boundary is "incognito mode"; the OS keeps state somewhere else.
+- Sandboxing without a session boundary is per-app isolation only; cross-session persistence undermines it.
+
+The session is the join point that turns four independent properties into a coherent privacy model.
+
+## Continue from here
+
+<CardGroup cols={2}>
+  <Card title="Session identity isolation" icon="user-secret" href="/architecture/session-isolation">
+    The full identity surface and what's scoped per session.
+  </Card>
+  <Card title="Sandboxed execution" icon="cube" href="/architecture/secure-execution">
+    The execution boundary every app runs inside, and per-app storage roots.
+  </Card>
+</CardGroup>

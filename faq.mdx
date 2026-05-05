@@ -1,0 +1,38 @@
+---
+title: "FAQ"
+description: "Common questions about BlackOps OS: how it works, how it compares to existing tools, how to get access, and what happens to data."
+---
+
+<AccordionGroup>
+  <Accordion title="What is BlackOps OS?">
+    A privacy-enforcing operating system. Routing, identity isolation, and execution sandboxing are properties of the OS itself, not opt-in apps. See [What Is BlackOps OS](/get-started/what-is-blackops) for the orientation.
+  </Accordion>
+
+  <Accordion title="How does BlackOps Route compare to a VPN?">
+    A VPN is a userspace tunnel client. Apps that route around it (default-route binding, raw sockets, alternate interfaces) bypass it silently, and the OS underneath the VPN keeps exposing a stable identity (MAC, hostname, machine ID, time skew) that ties sessions together regardless of what the tunnel does.
+
+    BlackOps Route is part of the OS network stack, not a userspace tunnel. Userspace cannot reach the network around it; if it is unhealthy, traffic fails closed. The identity surface above the routing layer is also session-scoped, which addresses the things a VPN cannot fix. See [BlackOps Route](/modules/route).
+  </Accordion>
+
+  <Accordion title="How does it compare to a privacy browser?">
+    A privacy browser handles surfaces inside the browser process: cookies, fingerprinting, tracker blocking. It does not change what the OS exposes (MAC, hostname, machine ID), what other apps on the device do, or where the network traffic actually goes. A correctly hardened browser running on an unmodified OS is still attached to a long-lived OS identity.
+
+    BlackOps OS handles the surfaces the browser cannot reach. The browser shipped with BlackOps OS handles its own in-process surfaces; everything below it is the OS. See [BlackOps Browser](/modules/browser).
+  </Accordion>
+
+  <Accordion title="How do I get access?">
+    V1.0 is invitation-based. Submit a request through the [access page](https://blackops-theta.vercel.app/#).
+  </Accordion>
+
+  <Accordion title="What devices does it run on?">
+    Hardware compatibility for the current release is documented on the [access page](https://blackops-theta.vercel.app/#).
+  </Accordion>
+
+  <Accordion title="Is my data stored anywhere?">
+    Inside a session: yes, in per-app sandbox storage. At session end: that storage is wiped unless the user explicitly marked specific subtrees as durable. Outside the session: no part of BlackOps OS sends user data to a backend. There is no centralized account state, no remote sync, and no analytics callback.
+  </Accordion>
+
+  <Accordion title="What survives a session?">
+    The user's explicit choices: long-lived contact identities for [Messenger](/modules/messenger), files the user has exported, OS configuration (theme, language preference), and per-app storage subtrees the user has marked durable. Everything else is wiped. There is no quiet third path that preserves application state.
+  </Accordion>
+</AccordionGroup>

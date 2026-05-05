@@ -1,73 +1,48 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "name": "Blackops OS",
+  "description": "Privacy enforced at OS level system level",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#d6d5da",
+    "light": "#d6d5da",
+    "dark": "#3d3c41"
   },
-  "favicon": "/favicon.svg",
+  "appearance": {
+    "default": "dark",
+    "strict": true
+  },
+  "favicon": "/images/favicon.png",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Overview",
+            "pages": ["index", "get-started/privacy-enforcement"]
+          },
+          {
+            "group": "How It Works",
             "pages": [
-              "index",
-              "quickstart",
-              "development"
+              "architecture/overview",
+              "architecture/secure-execution",
+              "architecture/session-isolation",
+              "architecture/session-model"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Built-in Modules",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "modules/browser",
+              "modules/messenger",
+              "modules/ops-ai",
+              "modules/route"
             ]
           },
           {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/components",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "Agent ready",
-            "pages": [
-              "agent-ready/prompt",
-              "agent-ready/visibility",
-              "agent-ready/contextual",
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
+            "group": "Token & FAQ",
+            "pages": ["tokenomics", "faq"]
           }
         ]
       }
@@ -75,52 +50,58 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "Twitter",
+          "href": "https://x.com/blckops",
+          "icon": "square-x-twitter"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Telegram",
+          "href": "https://t.me/blckops",
+          "icon": "telegram"
         }
       ]
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/images/logo.svg",
+    "dark": "/images/logo.svg"
+  },
+  "background": {
+    "decoration": "windows",
+    "color": {
+      "light": "#F2F2F2",
+      "dark": "#070709"
+    }
   },
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Buy $OPS",
+        "href": "http://blackops-theta.vercel.app/"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Download OS",
+      "href": "http://blackops-theta.vercel.app/"
     }
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/blckops",
+      "telegram": "https://t.me/blckops"
     }
   }
 }
