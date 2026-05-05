@@ -1,13 +1,13 @@
 ---
 title: "Writing"
-description: "How digital data is translated into DNA molecules using combinatorial assembly — scalable, cost-efficient, and structured for in-place compute."
+description: "How digital data is translated into DNA molecules using combinatorial assembly  scalable, cost-efficient, and structured for in-place compute."
 ---
 
 Writing digital data into DNA requires translating bits into molecular form. Instead of synthesizing one long strand per data sequence, xDNA Labs uses a combinatorial assembly method that is significantly more scalable and efficient.
 
 ## From Data to Codewords
 
-Information is divided into symbols. Each symbol is mapped to a fixed-length **codeword** — a bit string designed with uniform properties such as a constant number of ones and zeros. This ensures:
+Information is divided into symbols. Each symbol is mapped to a fixed-length **codeword** a bit string designed with uniform properties such as a constant number of ones and zeros. This ensures:
 
 - Simplified error handling
 - High signal-to-noise ratios during retrieval
@@ -20,19 +20,19 @@ Rather than creating each codeword base-by-base, xDNA constructs molecules calle
 <CardGroup cols={2}>
   <Card title="Layer-by-layer assembly" icon="layer-group">
     Each layer contains multiple possible DNA components. One component is
-    chosen from each layer and ligated together — the result is a unique
-    sequence that encodes a specific part of the dataset.
+    chosen from each layer and ligated together the result is a unique sequence
+    that encodes a specific part of the dataset.
   </Card>
   <Card title="Exponential address space" icon="infinity">
     With only a few hundred components divided into layers, it is possible to
-    assemble trillions of distinct identifiers — exponential expansion with
+    assemble trillions of distinct identifiers exponential expansion with
     simple, cost-effective chemistry.
   </Card>
 </CardGroup>
 
 ## Trie-like Structure
 
-The identifiers naturally form a **trie** — a tree-like data structure where each path from root to leaf corresponds to a sequence of components that encodes a codeword. This organization makes it possible to later traverse and query the archive using biochemical operations rather than digital scanning.
+The identifiers naturally form a **trie** a tree-like data structure where each path from root to leaf corresponds to a sequence of components that encodes a codeword. This organization makes it possible to later traverse and query the archive using biochemical operations rather than digital scanning.
 
 <Note>
   The trie structure is what makes in-DNA compute possible. It turns the archive
@@ -56,7 +56,7 @@ The identifiers naturally form a **trie** — a tree-like data structure where e
   </Step>
   <Step title="Archive the library">
     The resulting DNA library contains millions of identifiers, each
-    representing a portion of the dataset — stable, inert, and ready for storage
+    representing a portion of the dataset stable, inert, and ready for storage
     or computation.
   </Step>
 </Steps>

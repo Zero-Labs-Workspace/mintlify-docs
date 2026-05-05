@@ -1,13 +1,13 @@
 ---
 title: "In-DNA Compute"
-description: "Computation performed directly on stored DNA molecules — enabling petabyte-scale search and filtering without bulk sequencing."
+description: "Computation performed directly on stored DNA molecules  enabling petabyte-scale search and filtering without bulk sequencing."
 ---
 
 In-DNA computing turns the archive itself into an associative memory. Computation is performed directly on stored molecules, so large collections can be searched and filtered in place before any bulk sequencing. The result is massive parallelism with very low energy cost and dramatic reductions in read volume.
 
 ## Data Model
 
-The archive is written as **identifiers** — DNA molecules assembled by choosing one component from each of several layers and ligating them in order.
+The archive is written as **identifiers** DNA molecules assembled by choosing one component from each of several layers and ligating them in order.
 
 <CardGroup cols={2}>
   <Card title="Combinatorial address space" icon="grid">
@@ -29,8 +29,8 @@ Two primitive operations form the core of in-DNA compute:
   <Card title="Select" icon="filter">
     Takes a key defined by a sequence of components across a contiguous set of
     layers. Returns the subset of identifiers that contain that key. Implemented
-    via recursive selective PCR — after *m* steps only identifiers containing
-    the full key remain enriched.
+    via recursive selective PCR after *m* steps only identifiers containing the
+    full key remain enriched.
   </Card>
   <Card title="Quotient" icon="compress">
     Takes a layer index *q*. Truncates all enriched molecules at layer *q* so
@@ -59,8 +59,8 @@ Two primitive operations form the core of in-DNA compute:
   </Step>
   <Step title="Sequence the enriched subset">
     A short sequencing run over this enriched library calls occurrences with
-    high signal-to-noise ratio — reading orders of magnitude fewer molecules
-    than a full scan.
+    high signal-to-noise ratio reading orders of magnitude fewer molecules than
+    a full scan.
   </Step>
 </Steps>
 
@@ -78,7 +78,7 @@ Real-valued embeddings are mapped to uniform-weight codewords so that similar ve
     Apply select on the union of the query's bit-position keys.
   </Step>
   <Step title="Apply quotient and measure signal">
-    Signal after quotient is proportional to shared one-bit positions — directly
+    Signal after quotient is proportional to shared one-bit positions directly
     correlating with semantic similarity.
   </Step>
   <Step title="Sequence top candidates">
@@ -92,7 +92,7 @@ Real-valued embeddings are mapped to uniform-weight codewords so that similar ve
 <Note>
   Select and quotient run in **single-instruction, multiple-data** fashion
   across the entire library. The number of wet-lab steps for a select equals the
-  number of layers in the key — it does **not** depend on total stored items.
+  number of layers in the key it does **not** depend on total stored items.
   Total reads can drop by **two to three orders of magnitude** relative to a
   full scan, while maintaining strong signal separation between targets and
   non-targets.
@@ -110,7 +110,7 @@ The same library supports additional molecular instructions:
 | Counting       | Concentration-based representation                        | Majority voting            |
 | Bit rewrite    | Selective enrichment + controlled ligation or degradation | In-place update            |
 
-These micro-instructions compose into higher-level operations — filtering, set logic, and associative arithmetic — directly in the archive.
+These micro-instructions compose into higher-level operations filtering, set logic, and associative arithmetic directly in the archive.
 
 ## Design Parameters
 
@@ -125,4 +125,4 @@ These micro-instructions compose into higher-level operations — filtering, set
 
 In-DNA computing excels at selection, association, and reduction over very large collections with extremely low energy. It is not a replacement for floating-point numerical computation or model training.
 
-The intended pattern is **molecular filtering and recall in place**, followed by compact digital sequencing and precise ranking. This hybrid approach combines molecular-scale parallelism with digital precision — the most efficient way to work with archives at petabyte and exabyte scale.
+The intended pattern is **molecular filtering and recall in place**, followed by compact digital sequencing and precise ranking. This hybrid approach combines molecular-scale parallelism with digital precision the most efficient way to work with archives at petabyte and exabyte scale.

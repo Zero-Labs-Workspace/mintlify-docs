@@ -12,18 +12,18 @@ $DNA is the unit of account for the xDNA Labs protocol. It is used for operator 
 
 ## Quick Reference
 
-| Field                 | Value                    |
-| --------------------- | ------------------------ |
-| Token name            | xDNA                     |
-| Ticker                | $DNA                     |
-| Total supply          | 1,000,000,000            |
-| Network               | TBD                      |
-| Contract address      | TBD (until deployed)     |
-| Decimals              | 18                       |
-| Mintable after launch | No                       |
-| Burn function         | Yes — see fee flow below |
+| Field                 | Value                  |
+| --------------------- | ---------------------- |
+| Token name            | xDNA                   |
+| Ticker                | $DNA                   |
+| Total supply          | 1,000,000,000          |
+| Network               | TBD                    |
+| Contract address      | TBD (until deployed)   |
+| Decimals              | 18                     |
+| Mintable after launch | No                     |
+| Burn function         | Yes see fee flow below |
 
-The total supply is fixed. There is no inflation mechanism after the emissions schedule completes. Burns reduce circulating supply but do not change total supply — the contract tracks the burned balance separately.
+The total supply is fixed. There is no inflation mechanism after the emissions schedule completes. Burns reduce circulating supply but do not change total supply the contract tracks the burned balance separately.
 
 ## Supply & Distribution
 
@@ -71,7 +71,7 @@ Maximum circulating supply at each milestone, in millions of $DNA:
 | 48      | ~900M       | ~100M                         |
 | 60+     | ~1,000M     | 0 (excluding burned balances) |
 
-These are ceilings computed from the vesting schedule. Actual circulating supply is typically lower — community programs running below cap, ecosystem grants vesting at varying rates, treasury draws below schedule maximum. It cannot be higher.
+These are ceilings computed from the vesting schedule. Actual circulating supply is typically lower community programs running below cap, ecosystem grants vesting at varying rates, treasury draws below schedule maximum. It cannot be higher.
 
 ## Utility
 
@@ -95,7 +95,7 @@ $DNA can be staked to support specific roles in the network.
 <CardGroup cols={2}>
   <Card title="Storage Operator Stake" icon="server">
     Operators commit a stake to run write, preserve, and query facilities. Stake
-    is slashable for documented misbehavior — downtime, failed proofs, or
+    is slashable for documented misbehavior downtime, failed proofs, or
     data-loss events.
   </Card>
   <Card title="Validator Stake" icon="scale-balanced">
@@ -119,8 +119,8 @@ Validators vote on proposals affecting the treasury, the ecosystem program, and 
 Proposals require a quorum of validator stake. Quorum and approval thresholds are placeholder until publication.
 
 <Note>
-  The protocol's core technical architecture — encoding schemes, chemistry
-  parameters, and sequencing standards — is not governed by token vote. Token
+  The protocol's core technical architecture encoding schemes, chemistry
+  parameters, and sequencing standards is not governed by token vote. Token
   governance is over the economy, not the scientific and technical
   infrastructure.
 </Note>
@@ -135,7 +135,7 @@ Where fees exist in the system, they flow through three sinks:
     permanently.
   </Card>
   <Card title="Operator Payout" icon="coins">
-    A portion goes to the operators who provided the underlying service — write
+    A portion goes to the operators who provided the underlying service write
     facilities, storage custodians, query nodes.
   </Card>
   <Card title="Treasury" icon="vault">
@@ -155,5 +155,5 @@ Placeholder split: **50% burn, 35% operator, 15% treasury.** The on-chain config
 ## What This Page Does Not Cover
 
 - **Price prediction.** xDNA Labs does not publish forecasts.
-- **How to acquire $DNA.** Acquisition channels change — check the project site for the current list.
+- **How to acquire $DNA.** Acquisition channels change check the project site for the current list.
 - **Tax treatment.** Consult a professional in your jurisdiction.

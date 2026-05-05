@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "xDNA Labs",
-  "description": "DNA-based data storage — decentralized, permanent, biological.",
+  "description": "DNA-based data storage  decentralized, permanent, biological.",
   "colors": {
     "primary": "#24db9b",
     "light": "#24db9b",
@@ -65,8 +65,8 @@
     }
   },
   "logo": {
-    "light": "/images/logo.svg",
-    "dark": "/images/logo.svg"
+    "light": "/images/logo-dark.png",
+    "dark": "/images/logo-dark.png"
   },
   "background": {
     "decoration": "windows",
